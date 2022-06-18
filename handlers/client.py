@@ -80,7 +80,7 @@ async def get_contact(message: types.Message, state: FSMContext):
         data["contact"] = message.contact.phone_number
     await  sql_add_user(state)
     await state.finish()
-    await message.answer(text="Благодарим! Чего желаете?")
+    await message.answer(text="Благодарим! Чего желаете?", reply_markup=button_case_client)
 
 
 

@@ -2,12 +2,23 @@ from aiogram.types import ReplyKeyboardMarkup, KeyboardButton, ReplyKeyboardRemo
 
 
 
-b1 = KeyboardButton('/restaurant_schedule')
-b2 = KeyboardButton('/location')
-b3 = KeyboardButton('/menu')
-b4 = KeyboardButton('/view_basket')
-b5 = KeyboardButton('/empty_basket')
-b6 = KeyboardButton('/checkout')
+# TODO b1 = KeyboardButton('/restaurant_schedule')
+b1 = KeyboardButton('Режим работы')
+
+# TODO b2 = KeyboardButton('/location')
+b2 = KeyboardButton('Расположение')
+
+# TODO b3 = KeyboardButton('/menu')
+b3 = KeyboardButton('Меню')
+
+# TODO b4 = KeyboardButton('/view_basket')
+b4 = KeyboardButton('Корзина')
+
+# TODO b5 = KeyboardButton('/empty_basket')
+b5 = KeyboardButton('Очистить корзину')
+
+# TODO b6 = KeyboardButton('/checkout')
+b6 = KeyboardButton('Оформить заказ')
 
 
 
