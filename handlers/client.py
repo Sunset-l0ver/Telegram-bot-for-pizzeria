@@ -5,6 +5,7 @@ from aiogram.types import ReplyKeyboardRemove, InlineKeyboardButton, InlineKeybo
 from keyboards.client_kb import button_case_client, button_contact
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
+from aiogram.dispatcher.filters import Text
 
 
 
@@ -163,15 +164,32 @@ async def menu(message: types.Message):
 
 def register_handlers_client(dp : Dispatcher):
     dp.register_message_handler(command_start, commands=["start"])
-    dp.register_message_handler(restaurant_schedule, commands=["restaurant_schedule"])
-    dp.register_message_handler(location, commands=["location"])
+
+    dp.register_message_handler(restaurant_schedule, commands="restaurant_schedule")
+    dp.register_message_handler(restaurant_schedule, text= "Режим работы")
+
+    dp.register_message_handler(location, commands=["location"]) 
+    dp.register_message_handler(location, text= "Расположение")
+
     dp.register_message_handler(menu, commands=["menu"])
+    dp.register_message_handler(menu, text= "Меню")
+
+    dp.register_message_handler(view_basket, commands=["view_basket"])
+    dp.register_message_handler(view_basket, text= "Корзина")
+
+    dp.register_message_handler(empty_basket, commands=["empty_basket"])
+    dp.register_message_handler(empty_basket, text= "Очистить корзину")
+
+    dp.register_message_handler(checkout, commands=["checkout"])
+    dp.register_message_handler(checkout, text= "Оформить заказ")
+
     dp.register_callback_query_handler(get_product, lambda x: x.data and x.data.startswith("Add_to_basket"))
     dp.register_message_handler(get_quantity, state = FSMBasket.count_req)
-    dp.register_message_handler(empty_basket, commands=["empty_basket"])
-    dp.register_message_handler(view_basket, commands=["view_basket"])
+
     dp.register_message_handler(get_name, state= FSMClient_info_request.request_name)
+
     dp.register_message_handler(get_contact, state= FSMClient_info_request.request_contact, content_types=["contact",])
-    dp.register_message_handler(checkout, commands=["checkout"])
+
     dp.register_message_handler(get_delivery_address, state= FSMOrdering.request_delivery_address)
+
     dp.register_message_handler(get_delivery_time, state= FSMOrdering.request_delivery_time)
