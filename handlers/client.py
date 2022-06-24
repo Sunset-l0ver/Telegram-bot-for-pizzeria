@@ -46,7 +46,7 @@ async def get_delivery_address(message: types.Message, state: FSMContext):
     async with state.proxy() as data:
         data["userid"] = message.from_user.id
         data["place"] = message.text
-    await message.answer("Укажите время доставки? (минимум 30 минут)")
+    await message.answer("Укажите время доставки в формате ЧЧ:ММ (минимум 30 минут)")
 
 
 
@@ -155,7 +155,7 @@ async def get_quantity(message : types.Message, state: FSMContext):
 async def menu(message: types.Message):
     read = await  sql_read_menu()
     for ret in read:
-        await bot.send_photo(message.from_user.id, ret[0], f"{ret[1]}\nОписание: {ret[2]}\nЦена {ret[-1]}", reply_markup=InlineKeyboardMarkup().\
+        await bot.send_photo(message.from_user.id, ret[0], f"{ret[1]}\nОписание: {ret[2]}\nЦена {ret[-1]} ₽", reply_markup=InlineKeyboardMarkup().\
             add(InlineKeyboardButton(f"Добавить в корзину", callback_data=f"Add_to_basket {ret[1]}")))
 
 
