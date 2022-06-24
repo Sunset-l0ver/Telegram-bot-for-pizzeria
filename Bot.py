@@ -1,7 +1,9 @@
 from aiogram.utils import executor
 from create_bot import *
 from data_base.sqlite_db import sql_start
-from handlers import client, admin
+from handlers import client, admin, other
+
+
 
 
 
@@ -11,8 +13,13 @@ async def on_startup(_):
 
 
 
+
+
 client.register_handlers_client(dp)
 admin.register_handlers_admin(dp)
+other.register_handlers_other(dp)
+
+
 
 
 

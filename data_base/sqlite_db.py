@@ -1,4 +1,3 @@
-from email.message import Message
 import sqlite3 as sq
 from create_bot import bot
 from aiogram import types
@@ -33,15 +32,15 @@ async def sql_add(state):
 
 
 
-async def sql_read_admin(message):
-    for ret in cur.execute("SELECT * FROM menu").fetchall():
-        await bot.send_photo(message.from_user.id, ret[0], f"{ret[1]}\nОписание: {ret[2]}\nЦена {ret[-1]}")
+# async def sql_read_admin(message):
+#     for ret in cur.execute("SELECT * FROM menu").fetchall():
+#         await bot.send_photo(message.from_user.id, ret[0], f"{ret[1]}\nОписание: {ret[2]}\nЦена {ret[-1]}")
 
 
 
 
 
-async def sql_read2():
+async def sql_read_menu():
     return cur.execute("SELECT * FROM menu").fetchall()
 
 
@@ -68,7 +67,6 @@ async def sql_add_to_basket(state):
 async def sql_empty_basket(message: types.Message):
     cur.execute("DELETE FROM basket WHERE userid == ?", (message.from_user.id,))
     base.commit()
-    await bot.send_message(message.from_user.id, text="Корзина очищена!")
 
 
 
@@ -127,3 +125,15 @@ async def sql_add_order(state: FSMContext, message: types.Message):
         cur.execute("INSERT INTO orders VALUES(?, ?, ?, ?, ?)", (last_id, data["userid"], basket, data["place"], data["time"],))
         base.commit()
     await sql_empty_basket(message)
+
+
+
+
+
+# TODO добавить функцию для забора заказа
+async def sql_get_order():
+    last_id = cur.execute("SELECT MAX(orderID) FROM orders")
+    order = cur.execute("SELECT * FROM orderID WHERE orderID == ?", (last_id,)).fetchone()[0]
+    msg = ""
+    for pos in order:
+        msg += pos + "\n"

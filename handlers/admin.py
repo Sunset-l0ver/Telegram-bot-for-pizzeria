@@ -1,6 +1,6 @@
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
-from create_bot import dp, bot
+from create_bot import bot
 from aiogram import types, Dispatcher
 from data_base import sqlite_db 
 from keyboards import admin_kb
@@ -109,7 +109,7 @@ async def del_callback(callback_query : types.CallbackQuery):
 async def delete_item(message: types.Message):
     global AdminID
     if message.from_user.id in AdminID:
-        read = await sqlite_db.sql_read2()
+        read = await sqlite_db.sql_read_menu()
         for ret in read:
             await bot.send_photo(message.from_user.id, ret[0], f"{ret[1]}\nОписание: {ret[2]}\nЦена {ret[-1]}")
             await bot.send_message(message.from_user.id, text= "^^^^", reply_markup=InlineKeyboardMarkup().\
@@ -121,11 +121,19 @@ async def delete_item(message: types.Message):
 
 def register_handlers_admin(dp: Dispatcher):
     dp.register_message_handler(admin_load, commands='загрузить', state = None)
+    
     dp.register_message_handler(cancel_handler, state="*", commands='отмена')
+    
     dp.register_message_handler(load_photo, content_types=["photo"], state=FSMAdmin.photo)
+    
     dp.register_message_handler(load_name, state=FSMAdmin.name)
+    
     dp.register_message_handler(load_description, state=FSMAdmin.description)
+    
     dp.register_message_handler(load_price, state=FSMAdmin.price)
+    
     dp.register_message_handler(make_changes, commands="moderator", is_chat_admin = True)
+    
     dp.register_callback_query_handler(del_callback, lambda x: x.data and x.data.startswith("del "))
+    
     dp.register_message_handler(delete_item, commands="удалить")

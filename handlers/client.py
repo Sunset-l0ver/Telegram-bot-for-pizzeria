@@ -5,7 +5,6 @@ from aiogram.types import ReplyKeyboardRemove, InlineKeyboardButton, InlineKeybo
 from keyboards.client_kb import button_case_client, button_contact
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
-from aiogram.dispatcher.filters import Text
 
 
 
@@ -117,6 +116,7 @@ async def location(message: types.Message):
 
 async def empty_basket(message: types.Message):
     await  sql_empty_basket(message)
+    await bot.send_message(message.from_user.id, text="Корзина очищена!")
 
 
 
@@ -153,10 +153,16 @@ async def get_quantity(message : types.Message, state: FSMContext):
 
 
 async def menu(message: types.Message):
-    read = await  sql_read2()
+    read = await  sql_read_menu()
     for ret in read:
         await bot.send_photo(message.from_user.id, ret[0], f"{ret[1]}\nОписание: {ret[2]}\nЦена {ret[-1]}", reply_markup=InlineKeyboardMarkup().\
             add(InlineKeyboardButton(f"Добавить в корзину", callback_data=f"Add_to_basket {ret[1]}")))
+
+
+
+
+
+
 
 
 
@@ -174,7 +180,7 @@ def register_handlers_client(dp : Dispatcher):
     dp.register_message_handler(menu, commands=["menu"])
     dp.register_message_handler(menu, text= "Меню")
 
-    dp.register_message_handler(view_basket, commands=["view_basket"])
+    dp.register_message_handler(view_basket, commands=["basket"])
     dp.register_message_handler(view_basket, text= "Корзина")
 
     dp.register_message_handler(empty_basket, commands=["empty_basket"])
