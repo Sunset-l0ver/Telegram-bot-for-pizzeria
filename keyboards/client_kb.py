@@ -18,11 +18,13 @@ b4 = KeyboardButton('Корзина')
 b5 = KeyboardButton('Очистить корзину')
 
 # TODO b6 = KeyboardButton('/checkout')
-b6 = KeyboardButton('Оформить заказ')
+b6 = KeyboardButton('Оформить')
+
+b7 = KeyboardButton('Отмена')
 
 
 
-button_case_client = ReplyKeyboardMarkup(resize_keyboard=True).add(b1).add(b2).insert(b3).add(b4).insert(b5).add(b6)
+button_case_client = ReplyKeyboardMarkup(resize_keyboard=True).add(b1).add(b2).insert(b3).add(b4).insert(b5).add(b6).insert(b7)
 
 
 

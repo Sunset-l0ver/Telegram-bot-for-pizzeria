@@ -59,6 +59,8 @@ async def sql_empty_basket(message: types.Message):
 async def sql_view_basket(id):
     read = cur.execute("SELECT * FROM КОРЗИНА WHERE ID_пользователя == ?",
                        (id,)).fetchall()
+    if read is None:
+        return "Корзина пуста"
     ret = ""
     total_sum = 0
     for entry in read:
@@ -127,3 +129,4 @@ async def sql_is_admin(id):
 
 async def sql_get_admins():
     return cur.execute("SELECT * FROM АДМИНИСТРАТОРЫ").fetchall()
+

@@ -22,9 +22,17 @@ class FSMClient_info_request(StatesGroup):
     request_contact = State()
 
 
+async def cancel_client(message: types.Message, state: FSMContext):
+    await state.finish()
+    await message.answer("Заказ отменен")
+
+
 async def checkout(message: types.Message):
-    await FSMOrdering.request_delivery_address.set()
-    await message.answer(text="Укажите адрес доставки")
+    if await sql_view_basket(message.from_user.id) == "Корзина пуста":
+        await message.answer("Ваша корзина пуста сейчас")
+    else:
+        await FSMOrdering.request_delivery_address.set()
+        await message.answer(text="Укажите адрес доставки")
 
 
 async def get_delivery_address(message: types.Message, state: FSMContext):
@@ -42,6 +50,7 @@ async def get_delivery_time(message: types.Message, state: FSMContext):
     await Send_order_to_admin(state)
     await sql_add_order(state, message)
     await message.answer("Спасибо. Заказ оформлен")
+    await state.finish()
 
 
 async def get_name(message: types.Message, state: FSMContext):
@@ -88,9 +97,13 @@ async def empty_basket(message: types.Message):
 
 
 async def view_basket(message: types.Message):
-    txt = await sql_view_basket(message.from_user.id)
-    msg = "В вашей корзине сейчас:" + txt
-    await bot.send_message(message.from_user.id, text=msg)
+    print("Привет")
+    if await sql_view_basket(message.from_user.id) == "Корзина пуста":
+        await message.answer("Ваша корзина пуста сейчас")
+    else:
+        txt = await sql_view_basket(message.from_user.id)
+        msg = "В вашей корзине сейчас:\n" + txt
+        await bot.send_message(message.from_user.id, text=msg)
 
 
 async def get_product(callback_query: types.CallbackQuery):
@@ -99,7 +112,7 @@ async def get_product(callback_query: types.CallbackQuery):
     async with state.proxy() as data:
         data["userid"] = callback_query.from_user.id
         data["product_name"] = callback_query.data.replace(
-            "Add_to_basket ", "")
+            "add", "")
     await bot.send_message(callback_query.from_user.id, text="Введите количество")
 
 
@@ -115,11 +128,13 @@ async def menu(message: types.Message):
     read = await sql_read_menu()
     for ret in read:
         await bot.send_photo(message.from_user.id, ret[0], f"{ret[1]}\nОписание: {ret[2]}\nЦена {ret[-1]} ₽", reply_markup=InlineKeyboardMarkup().
-                             add(InlineKeyboardButton(f"Добавить в корзину", callback_data=f"Add_to_basket {ret[1]}")))
+                             add(InlineKeyboardButton(f"Добавить в корзину", callback_data=f"add{ret[1]}")))
 
 
 def register_handlers_client(dp: Dispatcher):
     dp.register_message_handler(command_start, commands=["start"])
+
+    dp.register_message_handler(cancel_client, text="Отмена", state="*")
 
     dp.register_message_handler(
         restaurant_schedule, commands="restaurant_schedule")
@@ -138,10 +153,10 @@ def register_handlers_client(dp: Dispatcher):
     dp.register_message_handler(empty_basket, text="Очистить корзину")
 
     dp.register_message_handler(checkout, commands=["checkout"])
-    dp.register_message_handler(checkout, text="Оформить заказ")
+    dp.register_message_handler(checkout, text="Оформить")
 
     dp.register_callback_query_handler(
-        get_product, lambda x: x.data and x.data.startswith("Add_to_basket"))
+        get_product, lambda x: x.data and x.data.startswith("add"))
     dp.register_message_handler(get_quantity, state=FSMBasket.count_req)
 
     dp.register_message_handler(

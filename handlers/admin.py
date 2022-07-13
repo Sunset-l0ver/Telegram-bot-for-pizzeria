@@ -1,9 +1,7 @@
-from email import message
 from aiogram.dispatcher import FSMContext
 from aiogram.dispatcher.filters.state import State, StatesGroup
 from create_bot import bot
 from aiogram import types, Dispatcher
-from data_base import sqlite_db
 from keyboards import admin_kb
 from aiogram.types import InlineKeyboardButton, InlineKeyboardMarkup
 from data_base.sqlite_db import *
@@ -23,7 +21,7 @@ async def admin_load(message: types.Message):
 
 
 async def cancel_handler(message: types.Message, state: FSMContext):
-    current_state = state.get_state
+    current_state = state.get_state()
     if current_state is None:
         return
     await state.finish()
@@ -74,7 +72,7 @@ async def del_callback(callback_query: types.CallbackQuery):
 async def Send_order_to_admin(state: FSMContext):
     admins = await sql_get_admins()
     async with state.proxy() as data:
-        txt = f"Поступил заказ.\nId пользователя {data['userid']}. Содержание заказа:\n" + await sql_view_basket(data['userid'])
+        txt = f"Поступил заказ.\nId пользователя {data['userid']}\nСодержание заказа:\n" + await sql_view_basket(data['userid']) + f"\nМесто доставки {data['place']}" + f"\nМесто доставки {data['time']}"
         for admin in admins:
             await bot.send_message(chat_id=admin[0], text=txt)
 
@@ -89,9 +87,9 @@ async def delete_item(message: types.Message, state: FSMContext):
 
 
 def register_handlers_admin(dp: Dispatcher):
-    dp.register_message_handler(admin_load, commands='загрузить', state=None)
+    dp.register_message_handler(admin_load, text='загрузить', state=None)
 
-    dp.register_message_handler(cancel_handler, state="*", commands='отмена')
+    dp.register_message_handler(cancel_handler, state="*", text='отмена')
 
     dp.register_message_handler(load_photo, content_types=[
                                 "photo"], state=FSMAdmin.photo)
@@ -108,4 +106,4 @@ def register_handlers_admin(dp: Dispatcher):
     dp.register_callback_query_handler(
         del_callback, lambda x: x.data and x.data.startswith("del "))
 
-    dp.register_message_handler(delete_item, commands="удалить")
+    dp.register_message_handler(delete_item, text="удалить")
