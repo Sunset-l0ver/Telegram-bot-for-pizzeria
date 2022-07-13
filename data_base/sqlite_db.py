@@ -59,7 +59,7 @@ async def sql_empty_basket(message: types.Message):
 async def sql_view_basket(id):
     read = cur.execute("SELECT * FROM КОРЗИНА WHERE ID_пользователя == ?",
                        (id,)).fetchall()
-    if read is None:
+    if not read:
         return "Корзина пуста"
     ret = ""
     total_sum = 0
@@ -109,7 +109,8 @@ async def sql_add_order(state: FSMContext, message: types.Message):
 
 async def sql_add_admin(message: types.Message):
     if cur.execute("SELECT * FROM АДМИНИСТРАТОРЫ WHERE ID_пользователя == ?", (message.from_user.id,)).fetchone() is None:
-        cur.execute("INSERT INTO АДМИНИСТРАТОРЫ VALUES(?)", (message.from_user.id,))
+        cur.execute("INSERT INTO АДМИНИСТРАТОРЫ VALUES(?)",
+                    (message.from_user.id,))
     base.commit()
 
 
@@ -130,3 +131,6 @@ async def sql_is_admin(id):
 async def sql_get_admins():
     return cur.execute("SELECT * FROM АДМИНИСТРАТОРЫ").fetchall()
 
+
+async def sql_get_user(id):
+    return cur.execute("SELECT * FROM ПОЛЬЗОВАТЕЛИ WHERE ID_пользователя == ?", (id,)).fetchone()

@@ -72,7 +72,9 @@ async def del_callback(callback_query: types.CallbackQuery):
 async def Send_order_to_admin(state: FSMContext):
     admins = await sql_get_admins()
     async with state.proxy() as data:
-        txt = f"Поступил заказ.\nId пользователя {data['userid']}\nСодержание заказа:\n" + await sql_view_basket(data['userid']) + f"\nМесто доставки {data['place']}" + f"\nМесто доставки {data['time']}"
+        user = await sql_get_user(data['userid'])
+        print(user)
+        txt = f"Поступил заказ.\nИмя пользователя: {user[1]}\nНомер телефона: {user[2]}\nСодержание заказа:\n" + await sql_view_basket(data['userid']) + f"\nМесто доставки {data['place']}" + f"\nВремя доставки {data['time']}"
         for admin in admins:
             await bot.send_message(chat_id=admin[0], text=txt)
 

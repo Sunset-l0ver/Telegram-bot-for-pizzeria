@@ -70,15 +70,14 @@ async def get_contact(message: types.Message, state: FSMContext):
     await message.answer(text="Благодарим! Чего желаете?", reply_markup=button_case_client)
 
 
-async def command_start(message: types.Message):
-    # try:
+async def command_start(message: types.Message, state: FSMContext):
     if await sql_check_user(message):
         await bot.send_message(message.from_user.id, "Вас привествует пиццерия Только вкусно! Как мы можем к вам обращаться?", reply_markup=ReplyKeyboardRemove())
+        await state.finish()
         await FSMClient_info_request.request_name.set()
     else:
+        state.finish
         await bot.send_message(message.from_user.id, "Вас привествует пиццерия Только вкусно!", reply_markup=button_case_client)
-    # except:
-        # await message.reply("Напишите боту в ЛС:\nhttps://t.me/only_tasty_bot")
 
 
 async def restaurant_schedule(message: types.Message):
@@ -97,7 +96,6 @@ async def empty_basket(message: types.Message):
 
 
 async def view_basket(message: types.Message):
-    print("Привет")
     if await sql_view_basket(message.from_user.id) == "Корзина пуста":
         await message.answer("Ваша корзина пуста сейчас")
     else:
