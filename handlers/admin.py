@@ -21,7 +21,7 @@ async def admin_load(message: types.Message):
 
 
 async def cancel_handler(message: types.Message, state: FSMContext):
-    current_state = state.get_state()
+    current_state = await state.get_state()
     if current_state is None:
         return
     await state.finish()
@@ -65,7 +65,7 @@ async def make_changes(message: types.Message):
 
 async def del_callback(callback_query: types.CallbackQuery):
     await sql_delete(callback_query.data.replace("del ", ""))
-    await callback_query.answer(text=f"{callback_query.data.replace('del ', '')} удалена.", show_alert=True)
+    await callback_query.answer(text=f"Позиция {callback_query.data.replace('del ', '')} удалена.", show_alert=True)
 
 
 # * Эта функция отправляет заказ администраторам
@@ -83,9 +83,8 @@ async def delete_item(message: types.Message, state: FSMContext):
     if await sql_is_admin(message.from_user.id):
         read = await sql_read_menu()
         for ret in read:
-            await bot.send_photo(message.from_user.id, ret[0], f"{ret[1]}\nОписание: {ret[2]}\nЦена {ret[-1]}")
-            await bot.send_message(message.from_user.id, text="^^^^", reply_markup=InlineKeyboardMarkup().
-                                   add(InlineKeyboardButton(f"удалить {ret[1]}", callback_data=f"del {ret[1]}")))
+            await bot.send_photo(message.from_user.id, ret[0], f"{ret[1]}\nОписание: {ret[2]}\nЦена {ret[-1]} ₽", reply_markup=InlineKeyboardMarkup().
+                                 add(InlineKeyboardButton(f"удалить {ret[1]}", callback_data=f"del {ret[1]}")))
 
 
 def register_handlers_admin(dp: Dispatcher):
